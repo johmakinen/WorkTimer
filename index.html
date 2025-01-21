@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WorkTimer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2%;
+    }
+    button {
+      font-size: 1.1em;
+      padding: 8px 12px;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+    #projects > div {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 90%;
+      max-width: 500px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .button-group {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .project-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-grow: 1;
+    }
+    .project-details {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    #totalTimer {
+      margin-top: 20px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      button {
+        font-size: 1em;
+        padding: 6px 10px;
+      }
+      #projects > div {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>WorkTimer</h1>
+
+  <div>
+    <input type="text" id="projectName" placeholder="Project name" style="font-size: 1.0em;">
+    <button id="addProjectBtn">Add Project</button>
+    <button id="singleModeBtn">Single Mode: OFF</button>
+  </div>
+
+  <div id="projects"></div>
+  <div id="totalTimer" style="position: fixed; top: 10px; right: 10px;">Total: 00:00:00</div>
+
+  <div style="position: fixed; bottom: 10px; right: 10px; font-size: 0.8em;">
+    © 2025 Johannes Mäkinen. All rights reserved.
+  </div>
+
+  <script>
+    const {
+      renderProjects,
+      addProject,
+      toggleSingleMode,
+      saveLogOnExit
+    } = require('./functions');
+
+    document.getElementById('addProjectBtn').addEventListener('click', () => {
+      const nameInput = document.getElementById('projectName');
+      const projectName = nameInput.value.trim();
+      if (projectName) {
+        addProject(projectName);
+        nameInput.value = '';
+      }
+    });
+
+    document.getElementById('singleModeBtn').addEventListener('click', toggleSingleMode);
+
+    window.addEventListener('beforeunload', saveLogOnExit);
+
+    renderProjects();
+  </script>
+</body>
+</html>
