@@ -1,4 +1,6 @@
 const { ipcRenderer } = require('electron');
+const fs = require('fs');
+const path = require('path');
 
 let projects = [];
 let singleMode = false;
@@ -47,6 +49,9 @@ function renderProjects() {
     container.appendChild(projectDiv);
   });
   updateTotalTimer();
+  if (ipcRenderer) {
+    ipcRenderer.send('adjust-window-size', projects.length);
+  }
 }
 
 function formatTime(elapsedMs) {
@@ -116,24 +121,32 @@ function stopAllProjects() {
 }
 
 function resetTimer(index) {
-  const project = projects[index];
-  clearInterval(project.intervalId);
-  project.startTime = 0;
-  project.elapsedTime = 0;
-  project.running = false;
-  renderProjects();
+  if (confirm('Are you sure you want to reset the timer?')) {
+    const project = projects[index];
+    clearInterval(project.intervalId);
+    project.startTime = 0;
+    project.elapsedTime = 0;
+    project.running = false;
+    renderProjects();
+  }
 }
 
 function deleteProject(index) {
-  const project = projects[index];
-  if (project.running) {
-    clearInterval(project.intervalId);
+  if (confirm('Are you sure you want to delete this project?')) {
+    const project = projects[index];
+    if (project.running) {
+      clearInterval(project.intervalId);
+    }
+    projects.splice(index, 1);
+    renderProjects();
   }
-  projects.splice(index, 1);
-  renderProjects();
 }
 
 function addProject(projectName) {
+  if (projects.some(project => project.name === projectName)) {
+    alert('A project with this name already exists.');
+    return;
+  }
   projects.push({
     name: projectName,
     startTime: 0,
@@ -153,7 +166,25 @@ function toggleSingleMode() {
 
 function saveLogOnExit() {
   stopAllProjects(); // stop all running timers
-  ipcRenderer.send('save-log', logEntries);
+  if (ipcRenderer) {
+    ipcRenderer.send('save-log', logEntries);
+  }
+}
+
+function suggestProjectNames() {
+  const logFilePath = path.join(__dirname, 'worktimer-log.csv');
+  if (!fs.existsSync(logFilePath)) return [];
+
+  const data = fs.readFileSync(logFilePath, 'utf8');
+  const lines = data.split('\n').slice(1); // skip header
+  const projectNames = new Set();
+
+  lines.forEach(line => {
+    const [name] = line.split(',');
+    if (name) projectNames.add(name);
+  });
+
+  return Array.from(projectNames);
 }
 
 module.exports = {
@@ -167,5 +198,6 @@ module.exports = {
   deleteProject,
   addProject,
   toggleSingleMode,
-  saveLogOnExit
+  saveLogOnExit,
+  suggestProjectNames
 };

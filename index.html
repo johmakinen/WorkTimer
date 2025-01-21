@@ -9,14 +9,14 @@
       margin: 2%;
     }
     button {
-      font-size: 1.1em;
-      padding: 8px 12px;
+      font-size: 0.825em; 
+      padding: 6px 9px; 
       margin-left: 5px;
       cursor: pointer;
     }
     #projects > div {
       border: 1px solid #ccc;
-      padding: 10px;
+      padding: 7.5px; 
       width: 90%;
       max-width: 500px;
       margin-bottom: 10px;
@@ -26,13 +26,13 @@
     }
     .button-group {
       display: flex;
-      gap: 5px;
+      gap: 3.75px; 
       align-items: center;
     }
     .project-info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 7.5px; 
       flex-grow: 1;
     }
     .project-details {
@@ -41,14 +41,14 @@
       width: 100%;
     }
     #totalTimer {
-      margin-top: 20px;
-      font-size: 1.2em;
+      margin-top: 15px; 
+      font-size: 0.9em; 
       font-weight: bold;
     }
     @media (max-width: 600px) {
       button {
-        font-size: 1em;
-        padding: 6px 10px;
+        font-size: 0.75em; 
+        padding: 4.5px 7.5px; 
       }
       #projects > div {
         width: 100%;
@@ -60,7 +60,8 @@
   <h1>WorkTimer</h1>
 
   <div>
-    <input type="text" id="projectName" placeholder="Project name" style="font-size: 1.0em;">
+    <input type="text" id="projectName" placeholder="Project name" list="projectSuggestions" style="font-size: 1.0em;">
+    <datalist id="projectSuggestions"></datalist>
     <button id="addProjectBtn">Add Project</button>
     <button id="singleModeBtn">Single Mode: OFF</button>
   </div>
@@ -77,7 +78,8 @@
       renderProjects,
       addProject,
       toggleSingleMode,
-      saveLogOnExit
+      saveLogOnExit,
+      suggestProjectNames
     } = require('./functions');
 
     document.getElementById('addProjectBtn').addEventListener('click', () => {
@@ -92,6 +94,14 @@
     document.getElementById('singleModeBtn').addEventListener('click', toggleSingleMode);
 
     window.addEventListener('beforeunload', saveLogOnExit);
+
+    const suggestions = suggestProjectNames();
+    const dataList = document.getElementById('projectSuggestions');
+    suggestions.forEach(name => {
+      const option = document.createElement('option');
+      option.value = name;
+      dataList.appendChild(option);
+    });
 
     renderProjects();
   </script>
